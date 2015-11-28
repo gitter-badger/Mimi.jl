@@ -1,36 +1,37 @@
 module metainfo
 
 type MetaVariable
-	name::Symbol
-	datatype::DataType
-	dimensions::Array{Any}
-	description::UTF8String
-	unit::UTF8String
+    name::Symbol
+    datatype::DataType
+    dimensions::Array{Any}
+    description::UTF8String
+    unit::UTF8String
 end
 
 type MetaComponent
-	name::UTF8String
-	variables::Dict{Symbol,MetaVariable}
+    module_name::Symbol
+    name::Symbol
+    variables::Dict{Symbol,MetaVariable}
 end
 
-const global _iamfmetainfo = Dict{Type,MetaComponent}()
+const global _mimi_metainfo = Dict{Tuple{Symbol,Symbol},MetaComponent}()
 
-function addcomponent(comp::DataType)
-	c = MetaComponent(string(comp), Dict{Symbol, MetaVariable}())
-	_iamfmetainfo[comp] = c
-	nothing
+function addcomponent(module_name::Symbol, component_name::Symbol)
+    c = MetaComponent(module_name, component_name, Dict{Symbol, MetaVariable}())
+    _mimi_metainfo[(module_name, component_name)] = c
+    nothing
 end
 
-function addvariable(comp::DataType, name, datatype, dimensions, description, unit)
-	c = _iamfmetainfo[comp]
+function addvariable(module_name::Symbol, component_name::Symbol, name, datatype, dimensions, description, unit)
+    c = _mimi_metainfo[(module_name, component_name)]
 
-	v = MetaVariable(name, datatype, dimensions, description, unit)
-	c.variables[name] = v
-	nothing
+    v = MetaVariable(name, datatype, dimensions, description, unit)
+    c.variables[name] = v
+    nothing
 end
 
 function getallcomps()
-	_iamfmetainfo
+    _mimi_metainfo
 end
 
 end
